@@ -24,6 +24,10 @@ export const GET = async () => {
         student: true, 
         course: true,  
       },
+      orderBy: {
+        
+        createdAt: 'asc', 
+      },
     });
 
    

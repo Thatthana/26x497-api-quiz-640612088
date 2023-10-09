@@ -10,24 +10,25 @@ export type StudentGetResponse = {
 export const GET = async () => {
   const prisma = getPrisma();
 
-  //2. Display list of student
-  // const students = await prisma...
-
   try {
     
-    const students = await prisma.student.findMany();
+    const students = await prisma.student.findMany({
+      orderBy: {
+        studentId: 'asc', 
+      },
+    });
+
     return NextResponse.json<StudentGetResponse>({
       students: students,
     });
   } catch (error) {
-    
     console.error("Error fetching students:", error);
 
+    
     return NextResponse.json<StudentGetResponse>({
       students: [],
     });
   }
-
 };
 
 export type StudentPostOKResponse = { ok: true };

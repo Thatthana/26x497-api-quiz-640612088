@@ -26,7 +26,7 @@ export const GET = async () => {
       },
       orderBy: {
         
-        createdAt: 'asc', 
+        createdAt: 'desc', 
       },
     });
 

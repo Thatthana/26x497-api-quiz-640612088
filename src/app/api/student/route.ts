@@ -13,9 +13,21 @@ export const GET = async () => {
   //2. Display list of student
   // const students = await prisma...
 
-  return NextResponse.json<StudentGetResponse>({
-    students: [], //replace empty array with result from DB
-  });
+  try {
+    
+    const students = await prisma.student.findMany();
+    return NextResponse.json<StudentGetResponse>({
+      students: students,
+    });
+  } catch (error) {
+    
+    console.error("Error fetching students:", error);
+
+    return NextResponse.json<StudentGetResponse>({
+      students: [],
+    });
+  }
+
 };
 
 export type StudentPostOKResponse = { ok: true };
@@ -32,8 +44,7 @@ export type StudentPostBody = Pick<
 export const POST = async (request: NextRequest) => {
   const body = (await request.json()) as StudentPostBody;
   const prisma = getPrisma();
-
-  //4. Add new Student data
+    //4. Add new Student data
   // await prisma...
 
   // return NextResponse.json<StudentPostErrorResponse>(
@@ -42,4 +53,42 @@ export const POST = async (request: NextRequest) => {
   // );
 
   // return NextResponse.json<StudentPostOKResponse>({ ok: true });
+
+
+
+  try {
+    
+    const existingStudent = await prisma.student.findUnique({
+      where: { studentId: body.studentId },
+    });
+
+    if (existingStudent) {
+     
+      return NextResponse.json<StudentPostErrorResponse>(
+        { ok: false, message: "Student Id already exists" },
+        { status: 400 }
+      );
+    }
+    
+    const newStudent = await prisma.student.create({
+      data: {
+        studentId: body.studentId,
+        firstName: body.firstName,
+        lastName: body.lastName,
+      },
+    });
+
+  
+    return NextResponse.json<StudentPostOKResponse>({ ok: true });
+  } catch (error) {
+  
+    console.error("Error creating a new student:", error);
+
+   
+    return NextResponse.json<StudentPostErrorResponse>(
+      { ok: false, message: "An error occurred" },
+      { status: 500 }
+    );
+  }
 };
+
